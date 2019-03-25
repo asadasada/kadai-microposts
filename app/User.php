@@ -34,27 +34,27 @@ class User extends Authenticatable
     
     public function followings()
     {
-        return $this->belongsToMany(User::class, 'user_follow', 'user_id', 'follow_id')->withTimestamps();
+        return $this->belongsToMany(Micropost::class, 'user_follow', 'user_id', 'follow_id')->withTimestamps();
     }
 
     public function followers()
     {
-        return $this->belongsToMany(User::class, 'user_follow', 'follow_id', 'user_id')->withTimestamps();
+        return $this->belongsToMany(Micropost::class, 'user_follow', 'follow_id', 'user_id')->withTimestamps();
     }
     
     public function follow($userId)
     {
         // 既にフォローしているかの確認
-        $exist = $this->is_following($userId);
+        $exist = $this->is_following($user_id);
         // 相手が自分自身ではないかの確認
-        $its_me = $this->id == $userId;
+        $its_me = $this->id == $user_id;
     
         if ($exist || $its_me) {
             // 既にフォローしていれば何もしない
             return false;
         } else {
             // 未フォローであればフォローする
-            $this->followings()->attach($userId);
+            $this->followings()->attach($user_id);
             return true;
         }
     }
@@ -62,13 +62,13 @@ class User extends Authenticatable
     public function unfollow($userId)
     {
         // 既にフォローしているかの確認
-        $exist = $this->is_following($userId);
+        $exist = $this->is_following($user_id);
         // 相手が自分自身ではないかの確認
-        $its_me = $this->id == $userId;
+        $its_me = $this->id == $user_id;
     
         if ($exist && !$its_me) {
             // 既にフォローしていればフォローを外す
-            $this->followings()->detach($userId);
+            $this->followings()->detach($user_id);
             return true;
         } else {
             // 未フォローであれば何もしない
@@ -78,13 +78,57 @@ class User extends Authenticatable
     
     public function is_following($userId)
     {
-        return $this->followings()->where('follow_id', $userId)->exists();
+        return $this->followings()->where('follow_id', $user_id)->exists();
     }
     
-    public function feed_microposts()
+   
+    
+    public function favorites()
     {
-        $follow_user_ids = $this->followings()->pluck('users.id')->toArray();
-        $follow_user_ids[] = $this->id;
-        return Micropost::whereIn('user_id', $follow_user_ids);
+        return $this->belongsToMany(Micropost::class, 'user_micropost', 'user_id', 'microposts_id')
+                    ->withTimestamps();
     }
+    
+      public function favorite($userId)
+    {
+       
+        $exist = $this->is_favorites($user_id);
+       
+        $its_me = $this->id == $user_id;
+    
+        if ($exist || $its_me) {
+           
+            return false;
+        } else {
+           
+            $this->favorites()->attach($user_id);
+            return true;
+        }
+    }
+    
+
+    
+    public function unfavorite($userId)
+    
+     {
+       
+        $exist = $this->is_favorites($user_id);
+        
+        $its_me = $this->id == $user_id;
+    
+        if ($exist || $its_me) {
+            
+            return false;
+        } else {
+            
+            $this->favorites()->detach($user_id);
+            return true;
+        }
+    }
+    
+    public function is_favoriting($userId)
+    {
+        return $this->followings()->where('favorite_id', $userId)->exists();
+    }
+
 }
