@@ -16,17 +16,16 @@ class CreateUserFavoritesTable extends Migration
         Schema::create('user_favorites', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned()->index();
-            $table->integer('microposts_id')->unsigned()->index();
-            $table->string('content');
+            $table->integer('micropost_id')->unsigned()->index();
             $table->timestamps();
             
                   
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('microposts_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('micropost_id')->references('id')->on('users')->onDelete('cascade');
 
             
             
-            $table->unique(['user_id', 'microposts_id']);
+            $table->unique(['user_id', 'micropost_id']);
             
             
           
