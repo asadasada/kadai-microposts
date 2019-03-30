@@ -33,7 +33,17 @@ class MicropostsController extends Controller
         ]);
 
         return back();
-    }
+        
+        $micropost = \App\Micropost::find($id);
+
+        if (\Auth::id() === $micropost->user_id) {
+            $micropost->favorite();
+        }
+
+        return back();
+    
+        
+    }   
     
     public function destroy($id)
     {

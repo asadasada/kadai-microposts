@@ -13,22 +13,18 @@ class CreateUserFavoritesTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_favorites', function (Blueprint $table) {
+        Schema::create('user_favorite', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned()->index();
-            $table->integer('micropost_id')->unsigned()->index();
+            $table->integer('favorite_id')->unsigned()->index();
             $table->timestamps();
             
-                  
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('micropost_id')->references('id')->on('users')->onDelete('cascade');
-
+            // 外部キー設定
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('favorite_id')->references('id')->on('microposts')->onDelete('cascade');
             
-            
-            $table->unique(['user_id', 'micropost_id']);
-            
-            
-          
+            // user_idとfavorite_idの組み合わせの重複を許さない
+            $table->unique(['user_id','favorite_id']);
         });
     }
 
@@ -39,6 +35,6 @@ class CreateUserFavoritesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_favorites');
+        Schema::dropIfExists('user_favorite');
     }
 }
